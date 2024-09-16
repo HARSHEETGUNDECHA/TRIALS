@@ -3,208 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Posting Platform</title>
+    <title>CODER'S IO</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+        }
+        .navbar h1 {
+            margin: 0;
+        }
+        #userProfile {
+            display: none;
             align-items: center;
         }
-
-        #login-container, .upload-form, .navbar {
+        #logoutBtn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+        #login-section, #post-section {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
             background-color: white;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-
-        #login-container {
-            width: 300px;
-            text-align: center;
-        }
-
-        input[type="email"], input[type="password"], textarea {
+        input, textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         button {
-            padding: 10px 20px;
+            padding: 10px;
             background-color: #28a745;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
         }
-
         button:hover {
             background-color: #218838;
         }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 900px;
+        #postsContainer {
+            margin-top: 2rem;
+            
+            
         }
-
-        .upload-form {
-            width: 100%;
-            max-width: 600px;
-            display: none;
-        }
-
-        #post-container {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
-
         .post {
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-left: 10%;
+        }
+        .post img {
+            max-width: 100%;
+            height: auto;
+        }
+        small {
+            color: #777;
+        }
+        #post-section{
+            margin-left: 60%;
         }
 
-        .post p {
-            margin: 5px 0;
-        }
-
-        .post small {
-            color: gray;
-        }
     </style>
+       <style>
+        .navbar {
+           background-color: #333;
+           width: 200px;
+           height: 100%;
+           float: left;
+           list-style-type: none;
+           margin: 0;
+           padding: 0;
+           margin-top: 25%;
+        }
+        
+        .navbar a {
+           
+           color: white;
+           text-align: center;
+           padding: 14px 16px;
+           text-decoration: none;
+        }
+        .navbar a:hover {
+           background-color: #111;
+        }
+     </style>
+  
 </head>
 <body>
-
-    <!-- Login Container -->
-    <div id="login-container">
-        <h2>Login</h2>
-        <input type="email" id="email" placeholder="Email"><br><br>
-        <input type="password" id="password" placeholder="Password"><br><br>
-        <button id="login-button">Login</button>
-    </div>
-
+   
     <!-- Navbar -->
-    <div class="navbar" style="display:none;">
-        <h2>Social Posting Platform</h2>
-        <button id="logout-button">Logout</button>
+    <nav>
+        <h1>coder's io</h1>
+        <div id="userProfile">
+            <span id="username"></span>
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="login-section">
+        <h2>Login / Sign Up</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button id="loginBtn">Login</button>
+        <button id="signUpBtn">Sign Up</button>
     </div>
 
-    <!-- Post Form -->
-    <div class="upload-form" style="display:none;">
-        <textarea id="post-description" placeholder="What's on your mind?" required></textarea><br><br>
-        <button id="upload-post-button">Post</button>
+    <div id="post-section" class="hidden">
+        <h2>Submit a Post</h2>
+        <textarea id="postContent" placeholder="Write a message..."></textarea>
+        <input type="file" id="mediaUpload" accept="image/*,video/*">
+        <button id="submitPostBtn">Submit Post</button>
+
+        <h2>Posts</h2>
+        <div id="postsContainer"></div>
     </div>
 
-    <!-- Post Container -->
-    <div id="post-container"></div>
+    <!-- Firebase JS SDK via CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
 
-    <!-- Firebase compat SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database-compat.js"></script>
-
+    <!-- App Logic -->
     <script>
-        // Firebase Configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCNyZAmw3D8aCqNOHOw0f3YKtZWNatauN8",
-            authDomain: "hello-4105a.firebaseapp.com",
-            databaseURL: "https://hello-4105a-default-rtdb.firebaseio.com/",
-            projectId: "hello-4105a",
-            storageBucket: "hello-4105a.appspot.com",
-            messagingSenderId: "978669199403",
-            appId: "1:978669199403:web:6c20e3dbaf815bba890a6e",
-            measurementId: "G-2TGPP3E88X"
+  authDomain: "hello-4105a.firebaseapp.com",
+  projectId: "hello-4105a",
+  storageBucket: "hello-4105a.appspot.com",
+  messagingSenderId: "978669199403",
+  appId: "1:978669199403:web:6c20e3dbaf815bba890a6e",
+  measurementId: "G-2TGPP3E88X"
         };
 
-        // Initialize Firebase with compat SDK
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.database();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-        // Login functionality
-        document.getElementById('login-button').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // DOM elements
+        const loginSection = document.getElementById('login-section');
+        const postSection = document.getElementById('post-section');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const signUpBtn = document.getElementById('signUpBtn');
+        const submitPostBtn = document.getElementById('submitPostBtn');
+        const mediaUpload = document.getElementById('mediaUpload');
+        const postsContainer = document.getElementById('postsContainer');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userProfile = document.getElementById('userProfile');
+        const username = document.getElementById('username');
 
+        // Authentication
+        loginBtn.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    document.getElementById('login-container').style.display = 'none';
-                    document.querySelector('.navbar').style.display = 'flex';
-                    document.querySelector('.upload-form').style.display = 'block';
-                    loadPosts();  // Load posts after login
+                .then(() => {
+                    loginSection.classList.add('hidden');
+                    postSection.classList.remove('hidden');
+                    loadPosts();
                 })
-                .catch((error) => {
-                    alert("Login failed. Please try again.");
-                });
+                .catch(error => alert(error.message));
         });
 
-        // Logout functionality
-        document.getElementById('logout-button').addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.reload();  // Refresh page after logout
-            });
+        signUpBtn.addEventListener('click', () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert('Account created successfully');
+                })
+                .catch(error => alert(error.message));
         });
 
-        // Post Upload functionality
-        document.getElementById('upload-post-button').addEventListener('click', () => {
-            const postMessage = document.getElementById('post-description').value;
-            const user = auth.currentUser;
-
-            if (postMessage && user) {
-                const postData = {
-                    userId: user.uid,
-                    message: postMessage,
-                    timestamp: Date.now(),
-                    userEmail: user.email
-                };
-
-                // Store post in Firebase Realtime Database
-                db.ref('posts').push(postData)
-                    .then(() => {
-                        document.getElementById('post-description').value = '';  // Clear input field
-                        loadPosts();  // Reload posts after uploading
-                    })
-                    .catch((error) => {
-                        console.error("Error uploading post: ", error);
-                    });
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                userProfile.style.display = 'flex';
+                username.innerText = user.email;
+                loginSection.classList.add('hidden');
+                postSection.classList.remove('hidden');
+                loadPosts();
             } else {
-                alert("Please enter a message.");
+                userProfile.style.display = 'none';
+                loginSection.classList.remove('hidden');
+                postSection.classList.add('hidden');
             }
         });
 
-        // Load posts from the database
-        function loadPosts() {
-            const postContainer = document.getElementById('post-container');
-            postContainer.innerHTML = '';  // Clear existing posts
-
-            db.ref('posts').orderByChild('timestamp').on('value', (snapshot) => {
-                postContainer.innerHTML = '';  // Clear posts before reloading
-                snapshot.forEach((childSnapshot) => {
-                    const post = childSnapshot.val();
-                    const postElement = document.createElement('div');
-                    postElement.className = 'post';
-                    postElement.innerHTML = `
-                        <p><strong>${post.userEmail}</strong></p>
-                        <p>${post.message}</p>
-                        <small>${new Date(post.timestamp).toLocaleString()}</small>
-                    `;
-                    postContainer.appendChild(postElement);
-                });
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                loginSection.classList.remove('hidden');
+                postSection.classList.add('hidden');
             });
+        });
+
+        // Posting logic
+        submitPostBtn.addEventListener('click', () => {
+            const postContent = document.getElementById('postContent').value;
+            const mediaFile = mediaUpload.files[0];
+
+            if (postContent || mediaFile) {
+                let postData = {
+                    content: postContent,
+                    userId: auth.currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                };
+
+                if (mediaFile) {
+                    const mediaRef = storage.ref().child(`posts/${auth.currentUser.uid}/${mediaFile.name}`);
+                    mediaRef.put(mediaFile).then(snapshot => {
+                        snapshot.ref.getDownloadURL().then(url => {
+                            postData.mediaURL = url;
+                            savePostToFirestore(postData);
+                        });
+                    });
+                } else {
+                    savePostToFirestore(postData);
+                }
+            }
+        });
+
+        function savePostToFirestore(postData) {
+            db.collection('posts').add(postData)
+                .then(() => {
+                    loadPosts();
+                })
+                .catch(error => console.error(error.message));
+        }
+
+        // Load posts
+        function loadPosts() {
+            postsContainer.innerHTML = '';
+            db.collection('posts').orderBy('timestamp', 'desc').get()
+                .then(snapshot => {
+                    snapshot.docs.forEach(doc => {
+                        const post = doc.data();
+                        const postDiv = document.createElement('div');
+                        postDiv.classList.add('post');
+
+                        postDiv.innerHTML = `
+                            <p>${post.content}</p>
+                            ${post.mediaURL ? `<img src="${post.mediaURL}" alt="media">` : ''}
+                            <small>Posted by: ${post.userId}</small>
+                        `;
+
+                        postsContainer.appendChild(postDiv);
+                    });
+                });
         }
     </script>
 </body>
